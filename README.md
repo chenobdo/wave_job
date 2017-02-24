@@ -3,6 +3,7 @@
 任务队列引擎是mysql数据库
 
 表
+```
 CREATE TABLE `jobs` (
   `jid` int(11) NOT NULL AUTO_INCREMENT,
   `job` varchar(64) NOT NULL COMMENT '任务名称',
@@ -17,7 +18,9 @@ CREATE TABLE `jobs` (
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`jid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
+```
 
+```
 CREATE TABLE `periodic_jobs` (
   `pjid` int(11) NOT NULL AUTO_INCREMENT,
   `pjob` varchar(64) NOT NULL COMMENT '任务名称',
@@ -30,3 +33,4 @@ CREATE TABLE `periodic_jobs` (
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`pjid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+```

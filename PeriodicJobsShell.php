@@ -43,7 +43,16 @@ class PeriodicJobsShell
             foreach ($periodicJobs as $pj) {
                 $periodTime = PeriodicJob::PeriodTime($pj);
                 if ($periodTime == $executeTimeStr) {
-                    $this->_buildJob($pj, $executeTime);
+                    //判断是否存在这样的任务
+                    $sameJob = $this->jobsModel->where([
+                        'job' => $pj['pjob'],
+                        'execute_after' => date('Y-m-d H:i:s', $executeTime),
+                        'pjid' => $pj['pjid']
+                    ])->getOne();
+
+                    if (empty($sameJob)) {
+                        $this->_buildJob($pj, $executeTime);
+                    }
                 }
             }
         }

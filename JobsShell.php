@@ -111,6 +111,9 @@ class JobsShell
             ];
             $this->jobsModel->saveLog($msg, $logdata);
             echo  $msg . PHP_EOL;
+        } elseif ($rt == Job::RESULT_NOT_IN_TIME) {
+            echo "[Failed]job-{$job['jid']}: {$job['job']} not in execute time.".PHP_EOL;
+            $this->jobsModel->update(['status' => Job::STATUS_UNEXECUTED], ['jid' => $job['jid']]);
         } else {
             if ($rt == Job::RESULT_EXCEPTION) {
                 $msg = "[Exception]job-{$job['jid']}:{$job['job']}:(" . $this->exceptionMessage . ")";
@@ -136,7 +139,8 @@ class JobsShell
     private function _executeTask($job)
     {
         //检查执行时间
-        if (!empty($job['execute_after']) && time() < $job['execute_after']) {
+        if (!empty($job['execute_after'])
+            && time() < strtotime($job['execute_after'])) {
             return Job::RESULT_NOT_IN_TIME;
         }
 
@@ -175,7 +179,8 @@ class JobsShell
         $jobIds = array_map(function ($v) {
             return $v['jid'];
         }, $jobs);
-        $this->jobsModel->in(['jid', implode($jobIds)])
+
+        return $this->jobsModel->in(['jid' => implode($jobIds)])
                         ->update([
                             'status' => Job::STATUS_EXECUTING
                         ], ['status' => Job::STATUS_UNEXECUTED]);

@@ -6,7 +6,7 @@
  * Time: 17:58
  */
 
-define('ROOT_PATH', dirname(__FILE__) . '/..');
+define('ROOT_PATH', dirname(__FILE__) . '/../..');
 
 require ROOT_PATH . '/vendor/autoload.php';
 require ROOT_PATH . '/../common/environment.php';

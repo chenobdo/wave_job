@@ -4,9 +4,11 @@
 
 表
 ```
-CREATE TABLE `jobs` (
+CREATE TABLE `k_jobs` (
   `jid` int(11) NOT NULL AUTO_INCREMENT,
   `job` varchar(64) NOT NULL COMMENT '任务名称',
+  `mark` text COMMENT '备注',
+  `type` tinyint(2) DEFAULT '1' COMMENT '类型（1-正式；2-测试）',
   `priority` tinyint(4) NOT NULL DEFAULT '10' COMMENT '优先级（数字大优先级高：最高级-100；高-50；普通-10；低-0）',
   `execute_after` datetime NOT NULL COMMENT '执行时间',
   `params` text COMMENT '任务参数',
@@ -17,13 +19,15 @@ CREATE TABLE `jobs` (
   `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`jid`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=160 DEFAULT CHARSET=utf8;
 ```
 
 ```
-CREATE TABLE `periodic_jobs` (
+CREATE TABLE `k_periodic_jobs` (
   `pjid` int(11) NOT NULL AUTO_INCREMENT,
   `pjob` varchar(64) NOT NULL COMMENT '任务名称',
+  `mark` text COMMENT '备注',
+  `type` tinyint(2) DEFAULT '1' COMMENT '类型（1-正式；2-测试）',
   `priority` tinyint(4) NOT NULL DEFAULT '10' COMMENT '优先级（数字大优先级高：最高级-100；高-50；普通-10；低-0）',
   `params` text COMMENT '任务参数',
   `status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '状态（1-可执行；10-暂停）',
@@ -32,5 +36,5 @@ CREATE TABLE `periodic_jobs` (
   `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`pjid`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 ```

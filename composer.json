@@ -1,0 +1,16 @@
+{
+    "name": "wave_job",
+    "description": "This package make crontab job.",
+    "keywords" : ["wave","crontab","job"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gabriel",
+            "email": "obdo.briel@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/routing": ">=4.0"
+    }
+}

@@ -1,5 +1,5 @@
 {
-    "name": "wave_job",
+    "name": "obdobriel/wave_job",
     "description": "This package make crontab job.",
     "keywords" : ["wave","crontab","job"],
     "license": "MIT",

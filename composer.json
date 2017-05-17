@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "wave\\job\\" : "src/"
+            "Job\\" : "src/"
         }
     }
 }

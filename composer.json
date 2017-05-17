@@ -9,8 +9,16 @@
             "email": "obdo.briel@gmail.com"
         }
     ],
+    "support": {
+        "issues": "https://github.com/obdobriel/wave_job/issues"
+    },
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/routing": ">=4.0"
+        "php": ">=5.6.0",
+        "xpmozong/wavephp2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "wave\\crontab_job\\" : "src/"
+        }
     }
 }

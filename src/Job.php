@@ -28,6 +28,9 @@ class Job extends Model
     const EXECUTE_AFTER = 1;
     const EXECUTE_NOW = 0;
 
+    const TYPE_MASTER = 1;
+    const TYPE_TEST = 2;
+
     /**
      * 初始化表
      * Author : Gabriel
@@ -53,6 +56,18 @@ class Job extends Model
             self::STATUS_TOO_MANY_ATTAMPTS => self::Status(self::STATUS_TOO_MANY_ATTAMPTS),
             self::STATUS_EXCEPTION         => self::Status(self::STATUS_EXCEPTION)
         ];
+    }
+
+    static public function Type($t)
+    {
+        switch ($t) {
+            case self::TYPE_MASTER :
+                return '正式';
+            case self::TYPE_TEST :
+                return '测试';
+            default:
+                return '未知';
+        }
     }
 
     /**
@@ -132,11 +147,11 @@ class Job extends Model
             $op .= '<li><a href="/jobs/execute/' . $data['jid'] . '" class="btn-confirm">执行</a></li>';
         }
         $op .= '</ul></div>';
-//		<li class="divider"></li>
 
         return [
             'jid'               => $data['jid'],
             'job'               => $data['job'],
+            'type'              => self::Type($data['type']),
             'priority'          => self::Priority($data['priority']),
             'params'            => $data['params'],
             'status'            => self::Status($data['status']),
@@ -161,5 +176,55 @@ class Job extends Model
             ->limit($skip, $limit)
             ->order('jid')
             ->getAll('*');
+    }
+
+    public function addJob(
+        $job,
+        $type,
+        $executeAfter,
+        $priority = self::PRIORITY_NORMAL,
+        $params = '',
+        $mark = ''
+    )
+    {
+        return $this->insert([
+            'job'           => $job,
+            'type'          => $type,
+            'priority'      => $priority,
+            'execute_after' => $executeAfter,
+            'params'        => trim($params),
+            'status'        => Job::STATUS_UNEXECUTED,
+            'created_at'    => date('Y-m-d H:i:s'),
+            'mark'          => $mark
+        ]);
+    }
+
+    public function modifyJob(
+        $jid,
+        $job,
+        $type,
+        $executeAfter,
+        $priority = self::PRIORITY_NORMAL,
+        $params = '',
+        $mark = ''
+    )
+    {
+        return $this->update([
+            'job'           => $job,
+            'type'          => $type,
+            'priority'      => $priority,
+            'execute_after' => $executeAfter,
+            'params'        => trim($params),
+            'status'        => Job::STATUS_UNEXECUTED,
+            'created_at'    => date('Y-m-d H:i:s'),
+            'mark'          => $mark
+        ], ['jid' => $jid]);
+    }
+
+    public function executeJob($jid)
+    {
+        return $this->update([
+            'execute_after' => date('Y-m-d H:i:s')
+        ], ['jid' => $jid]);
     }
 }

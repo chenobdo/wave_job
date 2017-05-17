@@ -26,7 +26,7 @@ class PeriodicJob extends Model
     {
         return [
             self::STATUS_EXECUTABLE => self::Status(self::STATUS_EXECUTABLE),
-            self::STATUS_PENDING => self::GetStatus(self::STATUS_PENDING)
+            self::STATUS_PENDING    => self::GetStatus(self::STATUS_PENDING)
         ];
     }
 
@@ -56,22 +56,22 @@ class PeriodicJob extends Model
      */
     public function preparePeriodicJob($data)
     {
-        $op  = '<a href="editperiodicjob/'.$data['pjid'].'" class="btn btn-xs btn-info">编辑</a>';
+        $op = '<a href="editperiodicjob/' . $data['pjid'] . '" class="btn btn-xs btn-info">编辑</a>';
         if ($data['status'] == PeriodicJob::STATUS_EXECUTABLE) {
-            $op .= ' | <a href="pendperiodicjob/'.$data['pjid'].'" class="btn btn-xs btn-default">暂停</a>';
+            $op .= ' | <a href="pendperiodicjob/' . $data['pjid'] . '" class="btn btn-xs btn-default">暂停</a>';
         } else {
-            $op .= ' | <a href="executeperiodicjob/'.$data['pjid'].'" class="btn btn-xs btn-success">执行</a>';
+            $op .= ' | <a href="executeperiodicjob/' . $data['pjid'] . '" class="btn btn-xs btn-success">执行</a>';
         }
 
         return [
-            'pjid' => $data['pjid'],
-            'pjob' => $data['pjob'],
-            'priority' => Job::Priority($data['priority']),
-            'params' => $data['params'],
-            'status' => self::Status($data['status']),
-            'period' => $data['period'],
+            'pjid'             => $data['pjid'],
+            'pjob'             => $data['pjob'],
+            'priority'         => Job::Priority($data['priority']),
+            'params'           => $data['params'],
+            'status'           => self::Status($data['status']),
+            'period'           => $data['period'],
             'period_parameter' => $data['period_parameter'],
-            'op' => $op
+            'op'               => $op
         ];
     }
 
@@ -104,6 +104,61 @@ class PeriodicJob extends Model
             default:
                 return null;
         }
+    }
+
+    public function addPeriodJob(
+        $pjob,
+        $type,
+        $period,
+        $priority = self::PRIORITY_NORMAL,
+        $params = '',
+        $periodParameter = ''
+    )
+    {
+        return $this->insert([
+            'pjob'             => $pjob,
+            'type'             => $type,
+            'priority'         => $priority,
+            'period'           => $period,
+            'params'           => $params,
+            'period_parameter' => $periodParameter,
+            'created_at'       => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    public function modifyPeriodJob(
+        $pjid,
+        $pjob,
+        $type,
+        $period,
+        $priority = self::PRIORITY_NORMAL,
+        $params = '',
+        $periodParameter = ''
+    )
+    {
+        return $this->update([
+            'pjob'             => $pjob,
+            'type'             => $type,
+            'priority'         => $priority,
+            'period'           => $period,
+            'params'           => $params,
+            'period_parameter' => $periodParameter,
+            'created_at'       => date('Y-m-d H:i:s')
+        ], ['pjid' => $pjid]);
+    }
+
+    public function executePeriodicjob($pjid)
+    {
+        return $this->update([
+            'status' => self::STATUS_EXECUTABLE
+        ], ['pjid' => $pjid]);
+    }
+
+    public function pendPeriodicjob($pjid)
+    {
+        return $this->update([
+            'status' => self::STATUS_PENDING
+        ], ['pjid' => $pjid]);
     }
 
     private static function _monthlyPeriodTime($job)

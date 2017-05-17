@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Job\\" : "src/model/"
+            "Job\\" : "src/"
         }
     }
 }

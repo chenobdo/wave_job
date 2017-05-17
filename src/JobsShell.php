@@ -15,11 +15,7 @@ class JobsShell
     public $exceptionMessage;
 
     const MAX_TASK_ATTEMPTS = 3;
-    // const EXPIRES_DURATION = 86400; // 24 * 3600
     const TASKS_PER_POLLING = 10;
-
-    // const BE_EXPIRES_DURATION = 86400; // 24 * 3600
-    // const BE_TASKS_PER_POLLING = 6;
 
     /**
      * JobsShell constructor.
@@ -66,12 +62,6 @@ class JobsShell
                 }
 
                 //判断过期
-                // $duration = time() - $job['created_at'];
-                // if ($duration > self::EXPIRES_DURATION) {
-                //   $this->jobsModel->update([
-                //     'status' => Job::STATUS_EXPIRES
-                //   ], ['jid' => $job['jid']]);
-                // }
 
                 //记录任务开始
                 $this->_logJobStart($job);
@@ -117,6 +107,10 @@ class JobsShell
         } else {
             if ($rt == Job::RESULT_EXCEPTION) {
                 $msg = "[Exception]job-{$job['jid']}:{$job['job']}:(" . $this->exceptionMessage . ")";
+                $this->jobsModel->update([
+                    'status' => Job::STATUS_EXCEPTION,
+                    'msg' => $this->exceptionMessage
+                ], ['jid' => $job['jid']]);
             } else {
                 $msg = "[Failed]job-{$job['jid']}:{$job['job']}";
             }

@@ -48,8 +48,7 @@ class PeriodicJobsShell
                         'job' => $pj['pjob'],
                         'execute_after' => date('Y-m-d H:i:s', $executeTime),
                         'pjid' => $pj['pjid']
-                    ])->getOne();
-
+                    ])->getOne();                    
                     if (empty($sameJob)) {
                         $this->_buildJob($pj, $executeTime);
                     }

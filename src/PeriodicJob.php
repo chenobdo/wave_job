@@ -87,23 +87,8 @@ class PeriodicJob extends Model
     {
         return $this->where($where)
             ->limit($skip, $limit)
+            ->order('pjid')
             ->getAll('*');
-    }
-
-    public static function PeriodTime($job)
-    {
-        switch ($job['period']) {
-            case 'monthly':
-                return self::_monthlyPeriodTime($job);
-            case 'daily':
-                return self::_dailyPeriodTime($job);
-            case 'weekly':
-                return self::_weeklyPeriodTime($job);
-            case 'hourly':
-                return self::_hourlyPeriodTime();
-            default:
-                return null;
-        }
     }
 
     public function addPeriodJob(
@@ -133,7 +118,8 @@ class PeriodicJob extends Model
         $period,
         $priority = self::PRIORITY_NORMAL,
         $params = '',
-        $periodParameter = ''
+        $periodParameter = '',
+        $status = self::STATUS_PENDING
     )
     {
         return $this->update([
@@ -143,6 +129,7 @@ class PeriodicJob extends Model
             'period'           => $period,
             'params'           => $params,
             'period_parameter' => $periodParameter,
+            'status'           => $status,
             'created_at'       => date('Y-m-d H:i:s')
         ], ['pjid' => $pjid]);
     }
@@ -161,6 +148,24 @@ class PeriodicJob extends Model
         ], ['pjid' => $pjid]);
     }
 
+    public static function PeriodTime($job)
+    {
+        switch ($job['period']) {
+            case 'monthly' :
+                return self::_monthlyPeriodTime($job);
+            case 'daily' :
+                return self::_dailyPeriodTime($job);
+            case 'weekly' :
+                return self::_weeklyPeriodTime($job);
+            case 'hourly' :
+                return self::_hourlyPeriodTime($job);
+            case 'minutely':
+                return self::_minutelyPeriodTime();
+            default:
+                return null;
+        }
+    }
+
     private static function _monthlyPeriodTime($job)
     {
         if (empty($job['period_parameter'])) {
@@ -174,32 +179,13 @@ class PeriodicJob extends Model
 
         $day = $params['day'];
         $hour = empty($params['hour']) ? 0 : $params['hour'];
+        $minute = empty($params['minute']) ? 0 : $params['minute'];
 
-        $monthTime = mktime($hour, 0, 0, date('n'), $day);
+        $monthTime = mktime($hour, $minute, 0, date('n'), $day);
         if ($monthTime < time()) {
-            $monthTime = mktime($hour, 0, 0, date('n') + 1, $day);
+            $monthTime = mktime($hour, $minute, 0, date('n') + 1, $day);
         }
-        return date('YmdH', $monthTime);
-    }
-
-    private static function _dailyPeriodTime($job)
-    {
-        if (empty($job['period_parameter'])) {
-            return null;
-        }
-
-        $params = json_decode($job['period_parameter'], true);
-        if (!isset($params['hour'])) {
-            return null;
-        }
-
-        $hour = $params['hour'];
-
-        $dayTime = mktime($hour, 0, 0);
-        if ($dayTime < time()) {
-            $dayTime = mktime($hour, 0, 0, date('n'), date('j') + 1);
-        }
-        return date('YmdH', $dayTime);
+        return date('YmdHi', $monthTime);
     }
 
     private static function _weeklyPeriodTime($job)
@@ -215,24 +201,68 @@ class PeriodicJob extends Model
 
         $w = $params['week_day'];
         $hour = empty($params['hour']) ? 0 : $params['hour'];
+        $minute = empty($params['minute']) ? 0 : $params['minute'];
         $cw = date('w');
         $cw = ($cw == 0 ? 7 : $cw);
 
         if ($w >= $cw) {
-            $weekTime = mktime($hour, 0, 0, date('n'), date('j') + $w - $cw);
+            $weekTime = mktime($hour, $minute, 0, date('n'), date('j') + $w - $cw);
         } else {
             $weekTime = 0;
         }
 
         if ($weekTime < time()) {
-            $weekTime = mktime($hour, 0, 0, date('n'), date('j') + 7 + $w - $cw);
+            $weekTime = mktime($hour, $minute, 0, date('n'), date('j') + 7 + $w - $cw);
         }
-        return date('YmdH', $weekTime);
+        return date('YmdHi', $weekTime);
     }
 
-    private static function _hourlyPeriodTime()
+    private static function _dailyPeriodTime($job)
     {
-        $t = mktime(date('H') + 1, 0, 0);
-        return date('YmdH', $t);
+        if (empty($job['period_parameter'])) {
+            return null;
+        }
+
+        $params = json_decode($job['period_parameter'], true);
+        if (!isset($params['hour'])) {
+            return null;
+        }
+
+        $hour = $params['hour'];
+        $minute = empty($params['minute']) ? 0 : $params['minute'];
+
+        $dayTime = mktime($hour, $minute, 0);
+        if ($dayTime < time()) {
+            $dayTime = mktime($hour, $minute, 0, date('n'), date('j') + 1);
+        }
+
+        return date('YmdHi', $dayTime);
+    }
+
+    private static function _hourlyPeriodTime($job)
+    {
+        if (empty($job['period_parameter'])) {
+            return null;
+        }
+
+        $params = json_decode($job['period_parameter'], true);
+        if (!isset($params['minute'])) {
+            return null;
+        }
+
+        $minute = $params['minute'];
+
+        $dayTime = mktime(date('H'), $minute, 0);
+        if ($dayTime < time()) {
+            $dayTime = mktime(date('H') + 1, $minute, 0);
+        }
+
+        return date('YmdHi', $dayTime);
+    }
+
+    private static function _minutelyPeriodTime()
+    {
+        $t = mktime(date('H'), date('i') + 1, 0);
+        return date('YmdHi', $t);
     }
 }
